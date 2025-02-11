@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('myportfolio_app.urls', namespace='myportfolio_app')), # myportfolio_app - путь маршрута к файлу(urls.py) глобальный
+    path('', include('myportfolio_app.urls', namespace='myportfolio_app')),
 ]

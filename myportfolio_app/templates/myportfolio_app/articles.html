@@ -1,0 +1,46 @@
+{% extends 'myportfolio_app/base.html' %}
+
+{% block title %}Статьи{% endblock %}
+
+{% block content %}
+<div class="articles-page">
+    <h1 class="page-title">Мои статьи</h1>
+
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="articles-container">
+        {% for article in articles %}
+        <div class="article-item">
+            <h2 class="article-title">{{ article.title }}</h2>
+            <p class="article-excerpt">{{ article.content|truncatewords:30 }}</p>
+            <a href="{% url 'myprofile:article_detail' article.id %}" class="button-read-more">Читать далее</a>
+        </div>
+        {% empty %}
+        <p class="no-articles">На данный момент статей нет.</p>
+        {% endfor %}
+    </div>
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+        {% endif %}
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+</div>
+{% endblock %}
