@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Мой сайт{% endblock %}</title>
+    {% load static %}
+    <!-- Подключение CSS файлов, если они есть -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'myportfolio_app:home' %}">Главная</a></li>
+                <li><a href="{% url 'myportfolio_app:projects' %}">Мои проекты</a></li>
+                <li><a href="{% url 'myportfolio_app:articles' %}">Мои статьи</a></li>
+                <!-- Добавьте другие ссылки на страницы вашего сайта -->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Содержимое этой части будет переопределено в других шаблонах -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Мой сайт. Все права защищены.</p>
+    </footer>
+
+    <!-- Подключение JS файлов, если они есть -->
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

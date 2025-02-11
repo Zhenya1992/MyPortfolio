@@ -1,24 +1,25 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.views import View
+from django.views.generic import View, TemplateView, ListView
+from .models import Project, Article
 
 
-class HomeView(View):
-
-    def get(self, request):
-        return HttpResponse("Главная страница")
+class HomeView(TemplateView):
+    template_name = 'myportfolio_app/home.html'
 
 
-class ProjectListView(View):
+class ProjectListView(ListView):
+    model = Project
+    template_name = 'myportfolio_app/projects.html'
+    context_object_name = 'projects'
+    paginate_by = 5
 
-    def get(self, request):
-        return HttpResponse("Страница проектов")
 
-
-class ArticleListView(View):
-
-    def get(self, request):
-        return HttpResponse("Здесь находятся статьи")
+class ArticleListView(ListView):
+    model = Article
+    template_name = 'myportfolio_app/articles.html'
+    context_object_name = 'articles'
+    paginate_by = 5
 
 
 class ContactView(View):

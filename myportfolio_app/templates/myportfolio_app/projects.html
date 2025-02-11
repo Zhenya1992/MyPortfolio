@@ -1,0 +1,39 @@
+{% extends 'myportfolio_app/base.html' %}
+
+{% block title %}Проекты{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Мои проекты</h1>
+<div class="projects-container">
+    {% for project in projects %}
+    <div class="project-item">
+        {% if project.image %}
+        <div class="project-image">
+            <img src="{{ project.image.url }}" alt="{{ project.title }}"
+                 style="width: 100%; height: auto; border-radius: 8px;">
+        </div>
+        {% endif %}
+        <h2>{{ project.title }}</h2>
+        <p>{{ project.description }}</p>
+        <a href="{% url 'myprofile:project_detail' project.id %}">Подробнее</a>
+    </div>
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+        {% endif %}
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+    {% empty %}
+    <p>Пока тут пусто.</p>
+    {% endfor %}
+</div>
+{% endblock %}
