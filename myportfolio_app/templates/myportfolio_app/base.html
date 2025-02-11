@@ -1,36 +1,50 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Мой сайт{% endblock %}</title>
+    <title>{% block title %}Женя топчик{% endblock %}</title>
     {% load static %}
-    <!-- Подключение CSS файлов, если они есть -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="{% url 'myportfolio_app:home' %}">Главная</a></li>
-                <li><a href="{% url 'myportfolio_app:projects' %}">Мои проекты</a></li>
-                <li><a href="{% url 'myportfolio_app:articles' %}">Мои статьи</a></li>
-                <!-- Добавьте другие ссылки на страницы вашего сайта -->
-            </ul>
-        </nav>
-    </header>
+<header>
+    <nav>
+        <ul class="nav-list">
+            <li class="{% if request.resolver_match.url_name == 'myportfolio_app:home' %}active{% endif %}">
+                <a href="{% url 'myportfolio_app:home' %}">Главная</a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'myportfolio_app:projects' %}active{% endif %}">
+                <a href="{% url 'myportfolio_app:projects' %}">Проекты</a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'myportfolio_app:articles' %}active{% endif %}">
+                <a href="{% url 'myportfolio_app:articles' %}">Статьи</a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'myportfolio_app:contact' %}active{% endif %}">
+                <a href="{% url 'myportfolio_app:contact' %}">Контакт</a>
+            </li>
+        </ul>
+    </nav>
+</header>
 
-    <main>
-        {% block content %}
-        <!-- Содержимое этой части будет переопределено в других шаблонах -->
-        {% endblock %}
-    </main>
+<main>
+    <!-- Блок для отображения изображений -->
+    {% block media %}
+    {% if image|default:'' %}
+    <div class="media-container">
+        <img src="{{ image.url }}" alt="Медиафайл" class="media-image">
+    </div>
+    {% endif %}
+    {% endblock %}
 
-    <footer>
-        <p>&copy; 2025 Мой сайт. Все права защищены.</p>
-    </footer>
+    <!-- Основной контент страницы -->
+    {% block content %}
+    <p>Содержимое будет здесь.</p>
+    {% endblock %}
+</main>
 
-    <!-- Подключение JS файлов, если они есть -->
-    <script src="{% static 'js/scripts.js' %}"></script>
+<footer>
+    <p>&copy; 2025 Женька навел грязь!.</p>
+</footer>
 </body>
 </html>
