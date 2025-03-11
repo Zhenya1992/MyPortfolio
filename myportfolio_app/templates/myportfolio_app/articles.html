@@ -9,19 +9,40 @@
     {% if messages %}
     <div class="messages-container">
         {% for message in messages %}
-        <div class="message">
+        {% if "Проект успешно добавлен!" not in message %}
+        <div class="message {{ message.tags }}">
             {{ message }}
         </div>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}
 
-    <div class="articles-container">
+    <!-- Форма поиска -->
+    <div class="search-container">
+        <form method="get" action="{% url 'myportfolio_app:articles' %}">
+            <input
+                    type="text"
+                    name="query"
+                    placeholder="Введите запрос для поиска..."
+                    value="{{ request.GET.query }}"
+                    class="search-input"
+            >
+            <button type="submit" class="button-search">Поиск</button>
+        </form>
+    </div>
+
+    <!-- Результаты поиска -->
+    {% if request.GET.query %}
+    <p class="search-results">Результаты поиска по запросу: <strong>{{ request.GET.query }}</strong></p>
+    {% endif %}
+
+     <div class="articles-container">
         {% for article in articles %}
         <div class="article-item">
             <h2 class="article-title">{{ article.title }}</h2>
             <p class="article-excerpt">{{ article.content|truncatewords:30 }}</p>
-            <a href="{% url 'myprofile:article_detail' article.id %}" class="button-read-more">Читать далее</a>
+            <a href="{% url 'myportfolio_app:article_detail' article.id %}" class="button-read-more">Подробнее</a>
         </div>
         {% empty %}
         <p class="no-articles">На данный момент статей нет.</p>
