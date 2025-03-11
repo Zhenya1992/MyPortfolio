@@ -4,85 +4,140 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #f4f4f4; /* Фон страницы */
     color: #333;
-    display: grid;
-    grid-template-rows: auto 1fr auto; /* Шапка, контент, футер */
-    min-height: 100vh; /* Минимальная высота равна высоте экрана */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Минимальная высота экрана */
 }
-
 /* Контейнер для основного содержимого */
 main {
+    flex: 1; /* Растягиваем main на всю доступную высоту */
+    width: 100%;
     max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
+    margin: 0 auto;
+    padding: 40px; /* Увеличенный внутренний отступ */
+    background-color: #fff; /* Фон основного контейнера */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
 }
+
+/* Стили для каждой статьи и проекта */
+.article-project {
+    width: 100%; /* Занимает всю ширину экрана */
+    margin-bottom: 30px; /* Увеличенный отступ между блоками */
+    padding: 30px; /* Увеличенный внутренний отступ */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+    .article-project:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+/* Стили для контента статьи */
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8; /* Межстрочный интервал */
+    text-align: justify; /* Выравнивание по ширине */
+    hyphens: auto;
+    padding: 10px 0;
+}
+    .article-content p {
+        margin-bottom: 30px; /* Увеличенный отступ между абзацами */
+        text-indent: 20px;
+    }
+    .article-content p:last-child {
+        margin-bottom: 0; /* Убираем отступ у последнего абзаца */
+    }
+.article-image img {
+    display: block;
+    margin: 0 auto;
+}
+    .article-content h2,
+    .article-content h3 {
+        margin-top: 40px; /* Увеличенный отступ перед заголовками */
+        margin-bottom: 20px; /* Увеличенный отступ после заголовков */
+        color: #2c3e50; /* Цвет заголовков */
+    }
+    .article-content a {
+        color: #3498db; /* Цвет ссылок */
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+        .article-content a:hover {
+            color: #f39c12; /* Цвет ссылок при наведении */
+        }
 /* Шапка */
 header {
     background-color: #2c3e50; /* Темно-синий */
     color: #fff; /* Белый текст */
-    padding: 10px 0;
+    padding: 20px 0; /* Увеличенный отступ */
     text-align: center;
 }
-
-header nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-}
-
-header nav ul li {
-    margin: 0 15px;
-}
-
-header nav ul li a {
-    color: #fff; /* Белый текст для ссылок */
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-header nav ul li a:hover {
-    color: #f39c12; /* Оранжевый при наведении */
-}
-
+    header nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+    }
+        header nav ul li {
+            margin: 0 20px; /* Увеличенный отступ между элементами меню */
+        }
+            header nav ul li a {
+                color: #fff; /* Белый текст для ссылок */
+                text-decoration: none;
+                font-weight: bold;
+                transition: color 0.3s ease;
+            }
+                header nav ul li a:hover {
+                    color: #f39c12; /* Оранжевый при наведении */
+                }
 /* Подвал */
 footer {
     background-color: #2c3e50;
     color: #fff;
     text-align: center;
-    padding: 10px 0;
+    padding: 20px 0; /* Увеличенный отступ */
 }
 
 /* Заголовки */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     color: #2c3e50; /* Темно-синий */
+    margin-top: 0;
 }
 
 h1 {
     font-size: 2.5rem;
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* Увеличенный отступ */
 }
 
 h2 {
     font-size: 2rem;
-    margin-bottom: 15px;
+    margin-bottom: 25px; /* Увеличенный отступ */
 }
 
 h3 {
     font-size: 1.5rem;
-    margin-bottom: 10px;
+    margin-bottom: 20px; /* Увеличенный отступ */
 }
 
 /* Параграфы */
 p {
     font-size: 1.1rem;
-    margin-bottom: 15px;
+    margin-bottom: 30px; /* Увеличенный отступ между абзацами */
+    line-height: 1.8; /* Межстрочный интервал */
+    text-align: justify; /* Выравнивание по ширине */
+}
+
+/* Убираем отступ у последнего абзаца в блоке */
+
+.article-project p:last-child {
+    margin-bottom: 0;
 }
 
 /* Ссылки */
@@ -91,37 +146,61 @@ a {
     text-decoration: none;
     transition: color 0.3s ease;
 }
+    a:hover {
+        color: #f39c12; /* Оранжевый при наведении */
+    }
 
-a:hover {
-    color: #f39c12; /* Оранжевый при наведении */
+/* Стили для полей ввода */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: calc(100% - 20px); /* Учитываем отступы */
+    padding: 10px; /* Внутренний отступ */
+    margin: 15px 0; /* Увеличенный отступ между полями */
+    border: 1px solid #ddd; /* Граница */
+    border-radius: 5px; /* Скругление углов */
+    background-color: #f9f9f9; /* Светлый фон */
+    font-size: 1rem; /* Размер шрифта */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Внутреннее затенение */
 }
+/* Стили для кнопок */
 
-/* Кнопки (если будут) */
 button {
     background-color: #3498db; /* Голубой */
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px; /* Увеличенный отступ */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-top: 15px; /* Увеличенный отступ сверху */
 }
 
-button:hover {
-    background-color: #2980b9; /* Темно-голубой */
-}
-
+    button:hover {
+        background-color: #2980b9; /* Темно-голубой */
+    }
 /* Адаптивность */
 @media (max-width: 768px) {
     header nav ul {
         flex-direction: column;
     }
-
-    header nav ul li {
-        margin: 10px 0;
-    }
-
+        header nav ul li {
+            margin: 15px 0; /* Увеличенный отступ между элементами меню */
+        }
     main {
-        padding: 10px;
+        padding: 20px; /* Увеличенный отступ для мобильных устройств */
+    }
+    h1 {
+        font-size: 2rem;
+    }
+    h2 {
+        font-size: 1.75rem;
+    }
+    h3 {
+        font-size: 1.25rem;
+    }
+    p {
+        font-size: 1rem;
     }
 }
