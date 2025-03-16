@@ -1,12 +1,17 @@
+import traceback
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.urls import reverse_lazy
 from django.views.generic import View, TemplateView, ListView, DetailView, CreateView
+
+from MyPortfolio import settings
 from .forms import ContactForm, ProjectForm, ArticleForm, SearchForm
 from .models import Project, Article
 from django.contrib import messages
+from django.core.mail import send_mail
 
 
 class HomeView(TemplateView):
@@ -134,9 +139,30 @@ class ContactView(View):
         form = ContactForm(request.POST)
         if form.is_valid():
             form.save()
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+
+            try:
+                send_mail(
+                    subject=f"Сообщение от : {name}",
+                    message=message,
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[settings.CONTACT_EMAIL],
+                    fail_silently=False,
+                )
+                return render(request, 'myportfolio_app/contact.html', {
+                    'form': ContactForm(),
+                    'success': True,
+                })
+            except Exception as e:
+                error_trace = traceback.format_exc()
+                print(error_trace, e)
+                # error_message = f"Ошибка при отправке : {e}"
+
             return render(request, 'myportfolio_app/contact.html', {
-                'form': ContactForm(),
-                'success': True,
+                'form': form,
+                'success': False,
             })
         return render(request, 'myportfolio_app/contact.html', {
             'form': form,
@@ -147,3 +173,13 @@ class ContactView(View):
 class Custom404View(View):
     def get(self, request):
         return render(request, 'myportfolio_app/404.html', status=404)
+
+
+def send_test_email(request):
+    subject = "Тестовое сообщение"
+    message = "Привет, проверка безопасности"
+    from_email = 'zhenyagolenko92@gmail.com'
+    recipient_list = ['ulia.maksimovich13@gmail.com']
+
+    send_mail(subject, message, from_email, recipient_list)
+    return HttpResponse("Письмо отправлено")

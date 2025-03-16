@@ -2,8 +2,12 @@ asgiref==3.8.1
 backports.zoneinfo==0.2.1
 Django==4.2.18
 pillow==10.4.0
+python-dotenv==1.0.1
 sqlparse==0.5.3
 typing-extensions==4.12.2
 tzdata==2025.1
+<<<<<<< HEAD
+=======
 ...
 ,,,
+>>>>>>> 00c1391bb8c8f25d2841a4b5bed79a4a343b28b0

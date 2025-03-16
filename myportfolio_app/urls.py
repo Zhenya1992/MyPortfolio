@@ -14,5 +14,6 @@ urlpatterns = [
     path('add_article/', views.ArticleCreateView.as_view(), name='add_article'),
     path('articles/<int:pk>/', views.ArticleDetailView.as_view(), name='article_detail'),
     path('404/', views.Custom404View.as_view(), name='custom404'),
+    path('send_mail/', views.send_test_email, name='send_test_mail'),
 
 ]
