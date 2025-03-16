@@ -1079,7 +1079,7 @@ python manage.py migrate
 
 191. В приложении myportfolio_app создаем новый модуль под названием middleware
 
-192. В модуле.py setting.py в директории проекта MyPortfolio в коллекции MIDDLEWARE в строковом формате добавляем название
+192. В модуле.py settings.py в директории проекта MyPortfolio в коллекции MIDDLEWARE в строковом формате добавляем название
 приложения myportfolio_app, далее middleware, а затем класс LoggingMiddleware, который, занимается логированием
 (записью информации о запросах, ответах или других событиях в лог-файл).
 'myportfolio_app.middleware.LoggingMiddleware',
@@ -1254,3 +1254,132 @@ context["form"] = SearchForm(self.request.GET)
 227. В модуле views.py в директории приложения myportfolio_app в классе ProjectListView в методе get_context_data
 возвращаем обновленный контекст, который будет передан в шаблон для отображения.
 return context
+
+228. В модуле settings.py в директории проекта MyPortfolio создаем новую переменную EMAIL_BACKEND, в которой указываем,
+какой бэкенд использовать для отправки электронной почты. В данном случае используется SMTP-бэкенд, который позволяет
+отправлять письма через SMTP-сервер.
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+229. В модуле settings.py в директории проекта MyPortfolio создаем новую переменную EMAIL_HOST, в которой указываем адрес
+SMTP-сервера, которыйбудет использоваться для отправки почты. В данном случае это сервер Gmail.
+EMAIL_HOST = 'smtp.gmail.com'
+
+230. В модуле settings.py в директории проекта MyPortfolio создаем новую переменную EMAIL_PORT, в которой указываем порт,
+который будет использоваться для подключения к SMTP-серверу. Порт 587 обычно используется для SMTP с TLS.
+EMAIL_PORT = 587
+
+231. В модуле settings.py в директории проекта MyPortfolio создаем новую переменную EMAIL_USE_TLS, в которой включаем
+использование TLS (Transport Layer Security) для шифрования соединения с SMTP-сервером. Это важно для безопасности
+передачи данных.
+EMAIL_USE_TLS = True
+
+232. В модуле settings.py в директории проекта MyPortfolio создаем новую переменную EMAIL_HOST_USER, в которой указываем
+email-адрес, от имени которого будут отправляться письма. В данном случае это мой Gmail-адрес.
+EMAIL_HOST_USER = 'zhenyagolenko92@gmail.com'
+
+233. Заходим в google chrome, затем в google аккаунт, далее в раздел безопасность, в разделе вход в google ищем
+двухэтапная аутентификация, затем пароли приложений и создаем приложение, совпадающее с названием нашего приложения.
+
+234. В директории проекта MyPortfolio созлаем новый файл, под названием .env.
+
+235. В файле .env создаем новую переменную EMAIL_HOST_PASSWORD, в которой хранится пароль от приложения.
+
+236. В модуле settings.py в директории проекта MyPortfolio из молуля dotenv импортируем функцию load_dotenv.
+from dotenv import load_dotenv
+
+237. В модуле settings.py в директории проекта MyPortfolio вызываем функцию load_dotenv.
+load_dotenv()
+
+238. В модуле settings.py в директории проекта MyPortfolio создаем новую переменную EMAIL_HOST_PASSWORD, в которой
+указываем пароль от email-адреса, указанного в EMAIL_HOST_USER. Пароль берется из переменной окружения, что является
+хорошей практикой для безопасности.
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+237. В модуле settings.py в директории проекта MyPortfolio создаем новую переменную CONTACT_EMAIL, в которой указываем
+email-адрес, на который будут отправляться письма. В данном случае это адрес получателя.
+CONTACT_EMAIL = 'ulia.maksimovich13@gmail.com'
+
+239. В модуле views.py в директории приложения myportfolio_app импортирует функцию send_mail из Django, которая используется
+для отправки электронной почты.
+from django.core.mail import send_mail
+
+240. В модуле views.py в директории приложения myportfolio_app создаем функцию для отправки тестовых писем send_test_email,
+принимающая в качестве параметра запрос request, который обычно используется в Django для обработки HTTP-запросов.
+def send_test_email(request):
+
+241. В модуле views.py в директории приложения myportfolio_app в функции send_test_email создаем новую переменную тема
+письма subject, которая содержит в строковом формате тему письма, которое будет отправлено.
+subject = "Тестовое сообщение"
+
+242. В модуле views.py в директории приложения myportfolio_app в функции send_test_email создаем новую переменную текст
+письма message, которая содержит в строковом формате текст письма.
+message = "Привет, проверка безопасности"
+
+243. В модуле views.py в директории приложения myportfolio_app в функции send_test_email создаем новую переменную адрес
+отправителя from_email, которая содержит адрес электронной почты, с которого будет отправлено письмо.
+from_email = 'zhenyagolenko92@gmail.com'
+
+244. В модуле views.py в директории приложения myportfolio_app в функции send_test_email создаем новую переменную адреса
+получателей recipient_list, в которой содержит список адресов электронной почты, на которые будет отправлено письмо.
+recipient_list = ['ulia.maksimovich13@gmail.com']
+
+245. В модуле views.py в директории приложения myportfolio_app в функции send_test_email вызываем функцию send_mail,
+которая отправляет электронное письмо. Функция принимает четыре аргумента: subject тема письма, message текст письма,
+from_email адрес отправителя, recipient_list список адресов получателей.
+send_mail(subject, message, from_email, recipient_list)
+
+246. В модуле views.py в директории приложения myportfolio_app в функции send_test_email с помощью ключевого слово для возврата
+return отправляем письмо. После отправки письма функция возвращает HTTP-ответ с текстом "Письмо отправлено". Это сообщение
+будет отображено в браузере или другом клиенте, который сделал запрос к этой функции.
+return HttpResponse("Письмо отправлено")
+
+247. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут(первый параметр 'send_mail'/), второй параметр - из модуля views.py берем функцию send_test_email,
+третий  - название url-файлов name с названием в строковом формате send_test_mail.
+path('send_mail/', views.send_test_email, name='send_test_mail'),
+
+248. В директории приложения myportfolio_app в директории templates в директории myportfolio_app создаю html-файлы, под
+названием send_test_email.
+
+249. В модуле views.py в директории приложения myportfolio_app в классе просмотра контактов ContactView, в методе
+поведения пост post в проверке валидности данных if form.is_valid() из очищенных данных формы (cleaned_data) извлекаются
+значения полей name, email и message. Эти данные были проверены и очищены в процессе валидации формы.
+name = form.cleaned_data['name']
+email = form.cleaned_data['email']
+message = form.cleaned_data['message']
+
+250. В модуле views.py в директории приложения myportfolio_app из проекта(пакета) MyPortfolio импортирую модуль settings.
+from MyPortfolio import settings
+
+251. В модуле views.py в директории приложения myportfolio_app в классе просмотра контактов ContactView, в методе
+поведения пост post в проверке валидности данных if form.is_valid() начинается блок try, который предназначен для
+обработки возможных исключений (ошибок) при отправке email. Вызывается функция send_mail, которая отправляет email, с
+параметрами: subject тема письма, которая включает имя отправителя, message текст сообщения, который был введен
+пользователем, from_email Email-адрес отправителя, который берется из настроек Django (settings.EMAIL_HOST_USER),
+recipient_list список получателей, это email-адрес, указанный в настройках (settings.CONTACT_EMAIL), fail_silently если
+False, то при ошибке отправки будет вызвано исключение.
+try:
+    send_mail(
+        subject=f"Сообщение от : {name}",
+        message=message,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[settings.CONTACT_EMAIL],
+        fail_silently=False,
+        )
+
+
+252. В модуле views.py в директории приложения myportfolio_app импортирую модуль traceback используется в Python для
+извлечения, форматирования и вывода информации о стеке вызовов (stack trace) при возникновении исключений. Он полезен
+для отладки, так как позволяет получить подробную информацию о том, где и почему произошла ошибка.
+import traceback
+
+253. В модуле views.py в директории приложения myportfolio_app в классе просмотра контактов ContactView, в методе
+поведения пост post в проверке валидности данных if form.is_valid() если при отправке email произошла ошибка, выполнение
+переходит в блок except, где обрабатывается исключение. В случае ошибки, с помощью traceback.format_exc() получается
+полная трассировка ошибки, которая затем выводится в консоль. Это помогает в отладке.
+except Exception as e:
+    error_trace = traceback.format_exc()
+    print(error_trace, e)
+
+254. В терминале прописываем команду для установки зависимостей.
+pip freeze > requirements.txt

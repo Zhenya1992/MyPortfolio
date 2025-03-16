@@ -4,3 +4,4 @@ db.sqlite3
 tutorial.txt
 /media
 logs/
+.env
