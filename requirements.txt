@@ -6,8 +6,4 @@ python-dotenv==1.0.1
 sqlparse==0.5.3
 typing-extensions==4.12.2
 tzdata==2025.1
-<<<<<<< HEAD
-=======
-...
-,,,
->>>>>>> 00c1391bb8c8f25d2841a4b5bed79a4a343b28b0
+
