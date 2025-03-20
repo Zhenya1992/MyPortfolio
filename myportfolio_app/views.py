@@ -1,5 +1,7 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 import traceback
-
+from django.core.cache import cache
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -18,6 +20,7 @@ class HomeView(TemplateView):
     template_name = 'myportfolio_app/home.html'
 
 
+@method_decorator(cache_page(60 * 5), name="dispatch")
 class ProjectListView(ListView):
     model = Project
     template_name = 'myportfolio_app/projects.html'
@@ -133,10 +136,20 @@ class ContactView(View):
         return render(request, 'myportfolio_app/contact.html', {
             'form': form,
             'success': False,
+            'spam_error': None,
         })
 
     def post(self, request):
         form = ContactForm(request.POST)
+
+        if not SpamProtection.check_rate_limit(request):
+            return render(request, "myportfolio_app/contact.html", {
+                'form': None,
+                'success': False,
+                'spam_error': "Ты охерел, ты превысел лимит отправки сообщений. Свяжитись со мной:"
+                              "<a href='https://t.me/Zecka92'>Telegram</a>."
+            })
+
         if form.is_valid():
             form.save()
             name = form.cleaned_data['name']
@@ -152,21 +165,25 @@ class ContactView(View):
                     fail_silently=False,
                 )
                 return render(request, 'myportfolio_app/contact.html', {
-                    'form': ContactForm(),
+                    'form': None,
                     'success': True,
+                    'spam_error': None,
                 })
+
             except Exception as e:
                 error_trace = traceback.format_exc()
                 print(error_trace, e)
-                # error_message = f"Ошибка при отправке : {e}"
+                error_message = f"Ошибка при отправке : {e}"
 
             return render(request, 'myportfolio_app/contact.html', {
                 'form': form,
                 'success': False,
+                'spam_error': error_message
             })
         return render(request, 'myportfolio_app/contact.html', {
             'form': form,
             'success': False,
+            'spam_error': "Заполните форму повторно"
         })
 
 
@@ -183,3 +200,20 @@ def send_test_email(request):
 
     send_mail(subject, message, from_email, recipient_list)
     return HttpResponse("Письмо отправлено")
+
+
+class SpamProtection:
+
+    @staticmethod
+    def check_rate_limit(request):
+        user_ip = request.META.get("REMOTE_ADDR")
+        cache_key = f"Rate_limit: {user_ip}"
+        requests_count = cache.get(cache_key, 0)
+
+        if requests_count >= 2:
+            return False
+        if requests_count == 0:
+            cache.set(cache_key, 1, timeout=60)
+        else:
+            cache.incr(cache_key, 1)
+        return True

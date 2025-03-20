@@ -1232,10 +1232,10 @@ query = forms.CharField(max_length=255, required=False, label="Поиск", widg
 в HTML-виджете указываем атрибут HTML-тега <input>, который добавляет CSS-класс form-control к полю ввода.
 'class': 'form-control',
 
-223. В модуле viewes.py в директории приложения myportfolio_app в классе ProjectListView создаем метод get_context_data
-метод, который используется для добавления дополнительных данных в контекст шаблона, принимающий паремерты self и **kwargs
-позволяет передавать в функцию произвольное количество именованных аргументов, а двойная звездочка (**) используется для
-упаковки этих аргументов в словарь.
+223. В модуле viewes.py в директории приложения myportfolio_app в классе ProjectListView создаем метод get_context_data,
+который используется для добавления дополнительных данных в контекст шаблона, принимающий паремерты self и **kwargs
+позволяет передавать в функциvenю произвольное количество именованных аргументов, а двойная звездочка (**) используется
+для упаковки этих аргументов в словарь.
 def get_context_data(self, **kwargs):
 
 224. В модуле viewes.py в директории приложения myportfolio_app в классе ProjectListView в методе get_context_data создаем
@@ -1381,5 +1381,319 @@ except Exception as e:
     error_trace = traceback.format_exc()
     print(error_trace, e)
 
-254. В терминале прописываем команду для установки зависимостей.
+254. В терминале прописываем команду для установки ависимостей: django-redis, django-filter, redis.
+pip install django-redis, django-filter, redis
+Далее эти зависимости устанавливаем с помошью команды, которую прописываем в терминале:
 pip freeze > requirements.txt
+
+255. В модуле views.py в директории приложения myportfolio_app создаю класс защита от спама SpamProtection.
+class SpamProtection:
+
+256. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection прописываем @staticmethod - декоратор,
+который обозначает метод проверки уровня ограничений check_rate_limit как статический метод. Статический метод — это метод,
+принадлежащий классу, а не экземпляру класса. Это означает, что к нему можно вызывать непосредственно класс, а не экземпляр
+класса. Определяем статический метод проверки уровня ограничений check_rate_limit, который принимает аргумент request.
+@staticmethod
+def check_rate_limit(request):
+
+257. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection в методе проверки уровня ограничений
+check_rate_limit создаем новую переменную user_ip для извлечения IP-адреса пользователя из объекта запроса request, из
+META - словаря, содержащий метаданные из HTTP-запроса, у META есть get - извлечь значения по ключу REMOTE_ADDR - ключ,
+который содержит строку с IP_адресом клиента.
+user_ip = request.META.get("REMOTE_ADDR")
+
+258. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection в методе проверки уровня ограничений
+check_rate_limit создаем новую переменную кэш-ключ cache_key для хранения данных в кэше (временном хранилище), в котрую
+с помощью f-строки подставляем значение из переменной user_ip внутрь строки. Этот ключ используется для идентификации
+запросов от конкретного IP-адреса в системе кэша.
+cache_key = f"Rate_limit: {user_ip}"
+
+259. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection в методе проверки уровня ограничений
+check_rate_limit создаем новую переменную количество запросов requests_count, которая обращается к кэшу, чтобы узнать,
+сколько запросов уже сделал пользователь с данным IP-адресом,кэш возвращает значение по ключу. Если ключ не существует в
+кэше (то есть это первый запрос от данного пользователя), возвращается значение по умолчанию 0. Если в кэше для этого
+IP-адреса нет данных, оличество запросов requests_count будет равно 0.
+requests_count = cache.get(cache_key, 0)
+
+260. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection в методе проверки уровня ограничений
+check_rate_limit производим проверку, превысил ли пользователь свой лимит. Если количество предыдущих запросов (requests_count)
+уже больше или равно 2, метод возвращает False. Это означает, что пользователь переполнил лимит запросов и его текущий
+запрос должен быть отклонен. Сразу после возврата из функции выполнение кода прекращается.
+if requests_count >= 2:
+    return False
+
+261. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection в методе проверки уровня ограничений
+check_rate_limit в проверке превышения пользователем своего лимита проверяем если это первый запрос от пользователя,
+устанавливаем ключ в кэше со значением 1 и значение время жизни ключа в кэше 60 сек.  После этого ключ будет автоматически удален.
+if requests_count == 0:
+    cache.set(cache_key, 1, timeout=60)
+
+262. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection в методе проверки уровня ограничений
+check_rate_limit в проверке превышения пользователем своего лимита если это не первый запрос, выполняется блок else,
+увеличиваем значение в кэше на 1. Если ранее было сделано 1 запрос, значение станет равным 2. Это обновляет количество
+запросов, сделанных пользователем за текущий 60-секундный интервал.
+else:
+    cache.incr(cache_key, 1)
+
+263. В модуле views.py в директории приложения myportfolio_app в классе SpamProtection в методе проверки уровня ограничений
+check_rate_limit в проверке превышения пользователем своего лимита если пользователь не превысил лимит своих запросов,
+метод возвращает True. Этот возврат сигнализирует системе, что текущий запрос можно обработать.
+
+264. В модуле views.py в директории приложения myportfolio_app в классе ContactView в методе get в возврате return
+функции рендеринга render в контексте - словаря используем новую переменную защита от спама spam_error уставнавливаем
+значение None.
+'spam_error': None,
+
+265. В модуле views.py в директории приложения myportfolio_app в классе ContactView в методе post проверяем, превышает
+ли пользователь допустимый лимит отправки сообщений. Метод check_rate_limit у класса SpamProtection  возвращает True,
+если лимит отправки не превышен, и False, если превышен, но not  инвертирует результат. Если лимит превышен (метод вернёт
+False), блок кода выполнится с параметром request.
+if not SpamProtection.check_rate_limit(request):
+
+266. В модуле views.py в директории приложения myportfolio_app в классе ContactView в методе post в проверке  превышения
+пользователем допустимого лимита отправки сообщений, Если лимит отправок превышен, используется функция render, чтобы
+вернуть HTML-шаблон пользователю, принимающая параметры запроса request - текущий запрос пользователя, путь к HTML-шаблону,
+который нужно отобразить пользователю и словарь, котрый передаёт контекстные данные (переменные), которые доступны в шаблоне
+HTML. Ключ 'form' устанавливается в None. Ключ 'success' передаётся с значением False. Обычно используется для отображения
+в шаблоне сообщения об ошибке. Например, можно показать пользователю, что запрос не был успешным. Передаётся строка с
+ключом 'spam_error', которая содержит текст ошибки, сообщающий пользователю, что он превысил лимит отправки сообщений.
+Сообщение добавляет прямую ссылку на Telegram (используется в формате HTML <a>). Если пользователь хочет продолжить
+отправку сообщений, он может связаться через Telegram.
+
+if not SpamProtection.check_rate_limit(request):
+    return render(request, "myportfolio_app/contact.html", {
+    'form': None,
+    'success': False,
+    'spam_error': "Ты охерел, ты превысел лимит отправки сообщений. Свяжитись со мной:"
+                  "<a href='https://t.me/Zecka92'>Telegram</a>."
+    })
+
+267. В модуле views.py в директории приложения myportfolio_app в классе ContactView в методе post в проверке валидности
+формы в конструкции try в возврате функции render в параметре, в словаре ключ формы form устанавливаем значение None.
+Cоздаем новую переменную защита от спама spam_error, устанавливаем значение None.
+form': None,
+'success': True,
+'spam_error': None,
+
+268. В модуле views.py в директории приложения myportfolio_app в классе ContactView в методе post в проверке валидности
+формы в конструкции except создаем новую переменную ошибка сообщения error_message, куда с помощью f-строки в строковом
+формате передаем ошибку с параметром {e}.
+error_message = f"Ошибка при отправке : {e}"
+
+269. В модуле views.py в директории приложения myportfolio_app в классе ContactView в методе post в проверке валидности
+формы после исключения в возврате функции render в парамерах в словаре создаем новую переменную защиты от спама spam_error,
+которая хранит сообщение о ошибке.
+'spam_error': error_message
+
+270. В модуле views.py в директории приложения myportfolio_app в классе ContactView в методе post в проверке валидности
+формы в возврате функции render в в парамерах в словаре создаем новую переменную защиты от спама spam_error, передаем
+значение в стрковом формате.
+'spam_error': "Заполните форму повторно"
+
+271. В модуле views.py в директории приложения myportfolio_app из модуля django.utils.decorators импортируем функцию
+method_decorator - используется для применения декораторов (например, cache_page) к методам класса. Это удобно, потому что
+декораторы в Django, такие как cache_page, предназначены для функций, а не для методов классов. method_decorator позволяет
+обернуть методы классов так, как будто они являются обычными функциями.
+from django.utils.decorators import method_decorator
+
+272. В модуле views.py в директории приложения myportfolio_app из модуля django.views.decorators.cache импортируем декоратор
+cache_page - это декоратор, который сохраняет результат функции в кэше на определённое время, для ускорения работы приложения
+за счёт кэширования часто вызываемых запросов. Когда запрос (с одним и тем же URL) повторяется, результат не вычисляется
+заново, а извлекается из кэша, что экономит ресурсы сервера.
+from django.views.decorators.cache import cache_page
+
+271. В модуле views.py в директории приложения myportfolio_app на класс ProjectListView "навешиваем" декоратор
+method_decorator, который принимает параметры: cache_page, с параметром timeout, который задаёт время (в секундах) для
+хранения результата в кэше и c указанием, что декоратор применяется только к методу dispatch.
+@method_decorator(cache_page(60 * 5), name="dispatch")
+
+272. В терминале прописываем команду для использования django rest_framework-а.
+pip install djangorestframework
+Далее эти зависимости устанавливаем с помошью команды, которую прописываем в терминале:
+pip freeze > requirements.txt
+
+273. В модуле settings.py в директории проекта MyPortfolio в коллекции INSTALLED_APPS в конец списка в строковом формате
+вносим название для подключения rest_framework-а.
+'rest_framework',
+
+274. В директории приложения myportfolio_app создаем новый файл под названием serializers.py.
+
+275. В модуле serializers.py в директории приложения myportfolio_app из библиотеки Django REST Framework (DRF) импортируем
+модуль serializers.
+from rest_framework import serializers
+
+276. В модуле serializers.py в директории приложения myportfolio_app из файла models.py импортирую класс Project и
+Article.
+from .models import Project, Article
+
+277. В модуле serializers.py в директории приложения myportfolio_app создаем новый класс сериализатора под названием
+ProjectSerializer, который наследуется от serializers.ModelSerializer, что предоставляет удобный способ создания
+сериализаторов, автоматически обрабатывающих поля из модели Django.
+class ProjectSerializer(serializers.ModelSerializer):
+
+278. В модуле serializers.py в директории приложения myportfolio_app в классе ProjectSerializer создаем вложенный класс
+Meta, который используется для настройки поведения сериализатора.
+class Meta:
+
+279. В модуле serializers.py в директории приложения myportfolio_app в классе ProjectSerializer во вложенном классе Meta
+создаем новую переменную model, в которой указывается, что сериализатор связан с моделью Django Project. Это значит, что
+сериализатор будет автоматически использовать поля модели Project для сериализации и десериализации данных.
+model = Project
+
+280. В модуле serializers.py в директории приложения myportfolio_app в классе ProjectSerializer во вложенном классе Meta
+создаем новую переменную fields, в которую в строковом формате говорим сериализатору, что нужно включить все поля из
+модели Project в сериализованные данные.
+fields = "__all__"
+
+281. В модуле serializers.py в директории приложения myportfolio_app создаем новый класс сериализатора под названием
+ArticleSerializer, который наследуется от serializers.ModelSerializer, что предоставляет удобный способ создания
+сериализаторов, автоматически обрабатывающих поля из модели Django.
+class ArticleSerializer(serializers.ModelSerializer):
+
+282. В модуле serializers.py в директории приложения myportfolio_app в классе ArticleSerializer создаем вложенный класс
+Meta, который используется для настройки поведения сериализатора.
+class Meta:
+
+283. В модуле serializers.py в директории приложения myportfolio_app в классе ArticleSerializer во вложенном классе Meta
+создаем новую переменную model, в которой указывается, что сериализатор связан с моделью Django Article. Это значит, что
+сериализатор будет автоматически использовать поля модели Article для сериализации и десериализации данных.
+model = Article
+
+284. В модуле serializers.py в директории приложения myportfolio_app в классе ArticleSerializer во вложенном классе Meta
+создаем новую переменную fields, в которую в строковом формате говорим сериализатору, что нужно включить все поля из
+модели Article в сериализованные данные.
+fields = "__all__"
+
+285. В директории приложения myportfolio_app создаем новый файл под названием api_views.py.
+
+286. В модуле api_views.py в директории приложения myportfolio_app из библиотеки Django REST Framework (DRF)
+rest_framework.filters импортируем классы SearchFilter и OrderingFilter. Эти фильтры позволяют добавлять поиск и сортировку
+к API. SearchFilter позволяет пользователям искать по определённым полям, а OrderingFilter позволяет им сортировать результаты.
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+287. В модуле api_views.py в директории приложения myportfolio_app из библиотеки Django REST Framework (DRF)
+rest_framework.generics импортируем ListAPIView - предоставляет функциональность для отображения списков объектов.
+RetrieveAPIView -предоставляет функциональность для получения одного объекта по его идентификатору.
+CreateAPIView - позволяет создавать новые объекты.
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+
+288. В модуле api_views.py в директории приложения myportfolio_app из файла serializers.py импортирую через точку
+сериализаторы ProjectSerializer и ArticleSerializer, которые преобразуют объекты Project и Article в JSON формат и обратно.
+Это важно для передачи данных через API.
+from .serializers import ProjectSerializer, ArticleSerializer
+
+289. В модуле api_views.py в директории приложения myportfolio_app из файла models.py импортирую классы Project и Article.
+from .models import Project, Article
+
+290. В модуле api_views.py в директории приложения myportfolio_app создаем новый класс ProjectListApi, который наследуется
+наследуется от ListAPIView. Это означает, что этот класс будет обрабатывать GET-запросы для получения списка проектов.
+class ProjectListApi(ListAPIView):
+
+291. В модуле api_views.py в директории приложения myportfolio_app в классе ProjectListApi создаем новую переменную, в
+которой указывается, что все объекты модели Project будут использоваться в этом представлении.
+queryset = Project.objects.all()
+
+292. В модуле api_views.py в директории приложения myportfolio_app в классе ProjectListApi создаем новую переменную, в
+которой указывается, что для сериализации объектов Project будет использоваться ProjectSerializer.
+serializer_class = ProjectSerializer
+
+293. В модуле api_views.py в директории приложения myportfolio_app в классе ProjectListApi создаем новую переменную, в
+которой задается список разрешений, которые будут применяться к этому api, т.е. любой пользователь может получить доступ
+к этому API.
+permission_classes = [AllowAny]
+
+294. В модуле api_views.py в директории приложения myportfolio_app в классе ProjectListApi создаем новую переменную, в
+которой указывается, что в этом представлении будут использоваться фильтры для поиска и сортировки.
+filter_backends = [SearchFilter, OrderingFilter]
+
+295. В модуле api_views.py в директории приложения myportfolio_app в классе ProjectListApi создаем новую переменную, в
+которой указывается поля, по которым будет производиться поиск.
+search_fields = ["title", "description"]
+
+296.В модуле api_views.py в директории приложения myportfolio_app в классе ProjectListApi создаем новую переменную, в
+которой указывается поля, по которым сортировать результаты.
+ordering_fields = ["title", "description"]
+
+297. В модуле api_views.py в директории приложения myportfolio_app в классе ProjectListApi создаем новую переменную, в
+которой задается поле по умолчанию, по которому будет упорядочен результат.
+ordering = ["created_at"]
+
+298. Для класса ArticleListApi пункты 291 - 297 аналогичны.
+
+299. Для классов ProjectDetailApi(RetrieveAPIView) и ArticleDetailApi(RetrieveAPIView) пункты 291 - 293 аналогичны.
+
+300. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут(первый параметр 'api/projects'/), второй параметр - из модуля api_views берем классы
+ProjectListApi, применяем метод as_view() - позволяет Django понять, что класс должен отображаться как функция(без
+этого метода визуализация не произойдет), третий - название url-файлов name с названием в строковом формате api_projects.
+path('api/projects', api_views.ProjectListApi.as_view(), name='api_projects'),
+
+301. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут(первый параметр 'api/articles'/), второй параметр - из модуля api_views берем классы
+ArticleListApi, применяем метод as_view() - позволяет Django понять, что класс должен отображаться как функция(без
+этого метода визуализация не произойдет), третий - название url-файлов name с названием в строковом формате api_articles.
+path('api/articles', api_views.ArticleListApi.as_view(), name='api_articles'),
+
+302. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут(первый параметр 'api/projects_detail/<int:pk>/' - динамический адрес, для просмотра всех
+проектов, добавляем динамический параметр ввиде первичного ключа primary key), второй параметр - из модуля views берем классы
+ProjectDetailApi, применяем метод as_view() - позволяет Django понять, что класс должен отображаться как функция(без
+этого метода визуализация не произойдет), третий - название url-файлов name с названием в строковом формате
+api_projects_detail.
+path('api/projects_detail/<int:pk>/', api_views.ProjectDetailApi.as_view(), name='api_projects_detail'),
+
+303. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут(первый параметр 'api/articles_detail/<int:pk>/' - динамический адрес, для просмотра всех
+проектов, добавляем динамический параметр ввиде первичного ключа primary key), второй параметр - из модуля views берем классы
+ArticleDetailApi, применяем метод as_view() - позволяет Django понять, что класс должен отображаться как функция(без
+этого метода визуализация не произойдет), третий - название url-файлов name с названием в строковом формате
+api_articles_detail
+path('api/articles_detail/<int:pk>/', api_views.ArticleDetailApi.as_view(), name='api_articles_detail'),
+
+304. Для класса ArticleCreateApi(CreateAPIView) пункты 291 и 292 аналогичны.
+
+305. В модуле api_views.py в директории приложения myportfolio_app в классе ArticleCreateApi создаем новую переменную, в
+которой задается список разрешений, которые будут применяться к этому api, т.е. только авторизированный пользователь
+может получить доступ к этому API.
+permission_classes = [IsAuthenticated]
+
+306. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут(первый параметр 'api/add_article/'), второй параметр - из модуля api_views берем классы
+ArticleCreateApi, применяем метод as_view() - позволяет Django понять, что класс должен отображаться как функция(без
+этого метода визуализация не произойдет), третий - название url-файлов name с названием в строковом формате api_add_article.
+path('api/add_article/', api_views.ArticleCreateApi.as_view(), name='api_add_article'),
+
+307. В модуле settings.py в директории проекта MyPortfolio в коллекции INSTALLED_APPS в конец списка в строковом формате
+вносим название библиотеки, которая предоставляет простой и эффективный способ работы с JWT для аутентификации в Django
+REST Framework. Она позволяет создавать, обновлять и проверять токены, поддерживая функции создания токенов - позволяет
+пользователям получать токены после успешной аутентификации; обновление токенов - токены имеют срок действия, и библиотека
+предоставляет механизм их обновления; проверки токенов - позволяет проверять действительность токена на стороне сервера.
+'rest_framework_simplejwt',
+
+308. В модуле settings.py в директории проекта MyPortfolio в коллекции INSTALLED_APPS в конец списка в строковом формате
+вносим название библиотеки, которая предоставляет возможность черного списка токенов.
+'rest_framework_simplejwt.token_blacklist',
+
+309. В модуле urls.py в директории приложения myportfolio_app из библиотеки rest_framework_simplejwt Django REST Framework
+из модуля views импортируем класс TokenObtainPairView - класс представления, который отвечает за создание пары токенов
+(access и refresh) при аутентификации пользователя и класс TokenRefreshView - класс представления, который отвечает за
+обновление access-токена с использованием refresh-токена.
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+310. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут для получения JWT-токенов(первый параметр — 'api/token/', второй параметр — из модуля
+rest_framework_simplejwt.views берем класс TokenObtainPairView, применяем метод as_view(), третий параметр — название
+URL-адреса name с названием в строковом формате token_obtain_pair. Этот маршрут используется для получения пары токенов
+(access и refresh) при аутентификации пользователя.
+path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+
+311. В модуле urls.py в директории приложения myportfolio_app добавляем в коллекцию(список) urlpatterns, через функцию
+пути path указываем маршрут для обновления access-токена(первый параметр — 'api/token/refresh/', второй параметр — из
+модуля rest_framework_simplejwt.views берем класс TokenRefreshView, применяем метод as_view(), третий параметр — название
+URL-адреса name с названием в строковом формате token_refresh. Этот маршрут используется для обновления access-токена с
+использованием refresh-токена, если access-токен истек.
+path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+
+
+
